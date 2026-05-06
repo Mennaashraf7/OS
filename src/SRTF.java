@@ -3,14 +3,12 @@ import java.util.*;
 public class SRTF {
 
     public static List<GanttEntry> schedule(List<Process> processes) {
-
         List<GanttEntry> gantt = new ArrayList<>();
 
         int currentTime = 0;
         int completed_processes = 0;
         int size = processes.size();
-
-        boolean[] inQueue = new boolean[size]; // CHANGED (was visited)
+        boolean[] inQueue = new boolean[size];
 
         Process previousProcess = null;
 
@@ -27,7 +25,6 @@ public class SRTF {
 
         while (completed_processes < size) {
 
-            // SAME STRUCTURE AS BEFORE, JUST USING inQueue
             for (int i = 0; i < size; i++) {
 
                 Process process = processes.get(i);
@@ -37,7 +34,7 @@ public class SRTF {
                         && !process.isCompleted()) {
 
                     readyQueue.add(process);
-                    inQueue[i] = true; // CHANGED ONLY HERE
+                    inQueue[i] = true; 
                 }
             }
 
