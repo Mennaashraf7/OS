@@ -14,30 +14,42 @@ public class ValidateInput {
                     System.out.println("Please enter a number between "+min+" and "+max);
                 }
             }catch(InputMismatchException e){
-                System.out.println("Erorr: Invalid input.\n please try again.");
+                System.out.println("Error: Invalid input.\n please try again.");
                 input.next();
             }
         }
         return value;
     }
+
+    // Arrival time
     public static int setValidArrivalTime(int PID){
         return getInt("Please enter the arrival time for process "+PID+": ",0,Integer.MAX_VALUE);
     }
+
+    // Burst time
     public static int setValidBurstTime(int PID){
         return getInt("Please enter the burst time for process "+PID+": ",1,Integer.MAX_VALUE);
     }
-    public static int setValidAlgorithmChoice(int PID){
-        return getInt("Please enter the algorithm choice"+PID,0,1);
+
+    // Algorithm choice
+    public static int setValidAlgorithmChoice() {
+        return getInt("Please enter the algorithm choice: (0 for Round Robin, 1 for SRTF): ", 0, 1);
     }
-    /*
-    * Wesal should here put validation method for time quantum,
 
+    // Time Quantum — only for Round Robin
+    public static int setValidTimeQuantum() {
+        return getInt("Please enter the time quantum: ", 1, 100);  //the max number here may change later
+    }
 
-    * validation method for number of process
-      and (check it's max number of process with team)
+    //Number of processes
+    public static int setValidNumberOfProcesses() {
+        return getInt("Please enter the number of processes: ", 1, 100);
+    }
 
-
-    * last put run again this simulation after finishing
-       like do you want to run it again if it is yes run another simulation again else exit program
-      (if it's logic needed from the team)*/
+    //Run again
+    public static boolean runAgain() {
+        System.out.println("Do you want to run another simulation? (1 = Yes | 0 = No): ");
+        return getInt("", 0, 1) == 1;
+    }
+      
 }
