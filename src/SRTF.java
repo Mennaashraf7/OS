@@ -51,6 +51,7 @@ public class SRTF {
              else{
                  readyQueue.add(currentProcess);
              }
+        //here should put previous process to remember it for next iteration
         }
         /*
           Wesal should add all process to gannt chart here to return it to the SRTF class for main
