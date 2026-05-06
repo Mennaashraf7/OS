@@ -1,6 +1,5 @@
-
 import java.util.*;
-
+import java.io.*;
 public class SRTF {
     public static List<int[]> schedule(List<Process> processes) {
         List<int[]> gantt = new ArrayList<>();
