@@ -1,9 +1,9 @@
 import java.util.*;
 
 public class RoundRobin {
-    public static List<int[]> schedule(List<Process> processes, int quantum) {
+    public static List<GanttEntry> schedule(List<Process> processes, int quantum) {
         // Gantt chart: each entry is [processIndex, startTime, endTime]
-        List<int[]> gantt = new ArrayList<>();
+        List<GanttEntry> gantt = new ArrayList<>();
 
         // We sort processes by arrival time first
         processes.sort(Comparator.comparingInt(p -> p.getArrivalTime()));
@@ -57,7 +57,11 @@ public class RoundRobin {
             int endTime = currentTime + runTime;
 
             // Add to Gantt chart
-            gantt.add(new int[]{frontIndex, startTime, endTime});
+            gantt.add(new GanttEntry(
+                    currentProcess.getPID(),
+                    startTime,
+                    endTime
+            ));
 
             // Update time and remaining burst
             currentTime = endTime;

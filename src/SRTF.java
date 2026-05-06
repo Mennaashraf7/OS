@@ -1,29 +1,43 @@
 import java.util.*;
-import java.io.*;
+
 public class SRTF {
-    public static List<int[]> schedule(List<Process> processes) {
-        List<int[]> gantt = new ArrayList<>();
+
+    public static List<GanttEntry> schedule(List<Process> processes) {
+
+        List<GanttEntry> gantt = new ArrayList<>();
+
         int currentTime = 0;
         int completed_processes = 0;
         int size = processes.size();
-        Process previousProcess = null;
-        boolean[] inQueue = new boolean[size]; 
 
-        Comparator<Process> strfRule = (p1, p2) -> {
+        boolean[] inQueue = new boolean[size]; // CHANGED (was visited)
+
+        Process previousProcess = null;
+
+        Comparator<Process> srtfRule = (p1, p2) -> {
             if (p1.getRemainingTime() == p2.getRemainingTime())
                 return Integer.compare(p1.getArrivalTime(), p2.getArrivalTime());
             else
                 return Integer.compare(p1.getRemainingTime(), p2.getRemainingTime());
         };
 
-        Queue<Process> readyQueue = new PriorityQueue<>(strfRule);
+        Queue<Process> readyQueue = new PriorityQueue<>(srtfRule);
+
+        int blockStartTime = 0;
 
         while (completed_processes < size) {
+
+            // SAME STRUCTURE AS BEFORE, JUST USING inQueue
             for (int i = 0; i < size; i++) {
+
                 Process process = processes.get(i);
-                if (!inQueue[i] && process.getArrivalTime() <= currentTime && !process.isCompleted()) {
+
+                if (!inQueue[i]
+                        && process.getArrivalTime() <= currentTime
+                        && !process.isCompleted()) {
+
                     readyQueue.add(process);
-                    inQueue[i] = true; 
+                    inQueue[i] = true; // CHANGED ONLY HERE
                 }
             }
 
@@ -31,52 +45,73 @@ public class SRTF {
 
             if (currentProcess == null) {
 
-            // EDITED: Add idle period to Gantt chart
-
-            if (gantt.isEmpty()
-                || gantt.get(gantt.size() - 1)[0] != -2) {
-
-                gantt.add(new int[]{-2, currentTime});
+                gantt.add(new GanttEntry(-1, currentTime, currentTime + 1));
+                currentTime++;
+                continue;
             }
 
-            // END OF EDIT
-
-            currentTime++;
-
-            continue;
-        }
-
-            // Response Time
+            // RESPONSE TIME
             if (!currentProcess.isStarted()) {
-                currentProcess.setResponseTime(currentTime - currentProcess.getArrivalTime());
+                currentProcess.setResponseTime(
+                        currentTime - currentProcess.getArrivalTime()
+                );
                 currentProcess.setStarted(true);
             }
 
-            // Gantt Chart + Context Switching
-            if (previousProcess == null || previousProcess.getPID() != currentProcess.getPID()) {
-                gantt.add(new int[]{currentProcess.getPID(), currentTime});
+            // START NEW BLOCK IF CONTEXT SWITCH
+            if (previousProcess == null ||
+                    previousProcess.getPID() != currentProcess.getPID()) {
+
+                blockStartTime = currentTime;
             }
 
-            currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
+            // EXECUTE 1 UNIT
+            currentProcess.setRemainingTime(
+                    currentProcess.getRemainingTime() - 1
+            );
             currentTime++;
 
-            // Completion Time, Turnaround Time, Waiting Time
+            // COMPLETION
             if (currentProcess.getRemainingTime() == 0) {
+
                 completed_processes++;
                 currentProcess.setCompleted(true);
-                currentProcess.setCompletionTime(currentTime);
-                currentProcess.setTurnaroundTime(currentTime - currentProcess.getArrivalTime());
-                currentProcess.setWaitingTime(
-                    currentProcess.getTurnaroundTime() - currentProcess.getBurstTime()
-                );
-            } else {
-                readyQueue.add(currentProcess); 
-            }
 
-            previousProcess = currentProcess;
+                currentProcess.setCompletionTime(currentTime);
+                currentProcess.setTurnaroundTime(
+                        currentTime - currentProcess.getArrivalTime()
+                );
+                currentProcess.setWaitingTime(
+                        currentProcess.getTurnaroundTime()
+                                - currentProcess.getBurstTime()
+                );
+
+                gantt.add(new GanttEntry(
+                        currentProcess.getPID(),
+                        blockStartTime,
+                        currentTime
+                ));
+
+                previousProcess = null;
+
+            } else {
+
+                readyQueue.add(currentProcess);
+
+                if (previousProcess != null &&
+                        previousProcess.getPID() != currentProcess.getPID()) {
+
+                    gantt.add(new GanttEntry(
+                            previousProcess.getPID(),
+                            blockStartTime,
+                            currentTime
+                    ));
+                }
+
+                previousProcess = currentProcess;
+            }
         }
 
-        gantt.add(new int[]{-1, currentTime});
         return gantt;
     }
 }
