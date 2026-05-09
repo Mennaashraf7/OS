@@ -20,7 +20,20 @@ public class ValidateInput {
         }
         return value;
     }
-
+    public static int setUniquePID(List<Process> existingProcesses) {
+        while (true) {
+            int id = getInt("Enter PID: ", 1, 1000);
+            boolean exists = false;
+            for (Process p : existingProcesses) {
+                if (p.getPID() == id) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) return id;
+            System.out.println("Error: This PID is already taken.");
+        }
+    }
     // Arrival time
     public static int setValidArrivalTime(int PID){
         return getInt("Please enter the arrival time for process "+PID+": ",0,Integer.MAX_VALUE);

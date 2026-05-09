@@ -5,13 +5,11 @@ class ValidateInput {
         while (flag) {
             // prompt() displays the question and blocks for input (matches Scanner behavior in browsers)
             let inputStr = prompt(question);
-            
             // Handle user closing/canceling the prompt dialog
             if (inputStr === null) {
                 console.log("Error: Invalid input.\n please try again.");
                 continue;
             }
-
             try {
                 // Simulate Java's nextInt() parsing & InputMismatchException
                 let parsed = parseInt(inputStr, 10);
@@ -30,7 +28,21 @@ class ValidateInput {
         }
         return value;
     }
-
+// أضف هذه الدالة داخل كلاس ValidateInput
+    static setUniquePID(existingData) {
+        while (true) {
+            let pid = prompt("Please enter a unique PID (e.g., P1, 101):");
+            if (pid === null) throw "EXIT_PROCESS";
+            
+            pid = pid.trim();
+            if (pid === "") pid = "P" + (existingData.length + 1);
+            let isDuplicate = existingData.some(item => String(item.id) === String(pid));
+            
+            if (!isDuplicate) return pid;
+            
+            alert(`Error: The PID "${pid}" is already taken. Please enter a unique ID.`);
+        }
+    }
     // Arrival time
     static setValidArrivalTime(PID) {
         return this.getInt("Please enter the arrival time for process " + PID + ": ", 0, 10e9);

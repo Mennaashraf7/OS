@@ -32,11 +32,23 @@ ValidateInput.getInt = function(q, min, max) {
     }
 };
 
-ValidateInput.getManualPID = function(index) {
-    let s = prompt(`Enter PID for Process ${index} (e.g. P1):`);
-    if (s === null) throw "EXIT_PROCESS";
-    return s.trim() === "" ? "P" + index : s;
+ValidateInput.setUniquePID = function(existingData) {
+    while (true) {
+        let pid = prompt("Please enter a unique PID (e.g., P1, 101):");
+        if (pid === null) throw "EXIT_PROCESS";
+        
+        pid = pid.trim();
+        if (pid === "") pid = "P" + (existingData.length + 1);
+
+        // بنحول لـ String عشان نتأكد إن رقم 1 هو هو نص "1" وميتكررش
+        let isDuplicate = existingData.some(item => String(item.id) === String(pid));
+        
+        if (!isDuplicate) return pid;
+        
+        alert(`Error: The PID "${pid}" is already taken. Please enter a unique ID.`);
+    }
 };
+// =========================================================
 
 // 3. Helper: PriorityQueue for SRTF logic
 class PriorityQueue {
@@ -72,7 +84,8 @@ function startManualInput() {
         const n = ValidateInput.setValidNumberOfProcesses();
         const data = [];
         for (let i = 0; i < n; i++) {
-            const pid = ValidateInput.getManualPID(i + 1);
+            // === استخدام الدالة الجديدة اللي بتمنع التكرار ===
+            const pid = ValidateInput.setUniquePID(data); 
             const arrival = ValidateInput.setValidArrivalTime(pid);
             const burst = ValidateInput.setValidBurstTime(pid);
             data.push({ id: pid, a: arrival, b: burst });
