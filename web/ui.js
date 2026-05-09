@@ -40,11 +40,10 @@ ValidateInput.setUniquePID = function(existingData) {
         pid = pid.trim();
         if (pid === "") pid = "P" + (existingData.length + 1);
 
-        // بنحول لـ String عشان نتأكد إن رقم 1 هو هو نص "1" وميتكررش
         let isDuplicate = existingData.some(item => String(item.id) === String(pid));
-        
+
         if (!isDuplicate) return pid;
-        
+
         alert(`Error: The PID "${pid}" is already taken. Please enter a unique ID.`);
     }
 };
@@ -59,7 +58,7 @@ class PriorityQueue {
 
 // 4. Controller
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     // Manual Simulation Button
     document.getElementById('run-btn').addEventListener('click', () => {
         startManualInput();
@@ -84,16 +83,15 @@ function startManualInput() {
         const n = ValidateInput.setValidNumberOfProcesses();
         const data = [];
         for (let i = 0; i < n; i++) {
-            // === استخدام الدالة الجديدة اللي بتمنع التكرار ===
-            const pid = ValidateInput.setUniquePID(data); 
+            const pid = ValidateInput.setUniquePID(data);
             const arrival = ValidateInput.setValidArrivalTime(pid);
             const burst = ValidateInput.setValidBurstTime(pid);
             data.push({ id: pid, a: arrival, b: burst });
         }
         const q = ValidateInput.setValidTimeQuantum();
         execute(data, q);
-    } catch (e) { 
-        if (e === "EXIT_PROCESS") console.log("User cancelled simulation."); 
+    } catch (e) {
+        if (e === "EXIT_PROCESS") console.log("User cancelled simulation.");
     }
 }
 
@@ -107,7 +105,7 @@ function runScenario(type) {
         case "B": d = [{id:"P1", a:0, b:10}, {id:"P2", a:1, b:2}]; q = 1; break;
         case "C": d = [{id:"P1", a:0, b:10}, {id:"P2", a:1, b:1}, {id:"P3", a:2, b:1}]; q = 4; break;
         case "D": d = [{id:"P1", a:0, b:5}, {id:"P2", a:0, b:5}, {id:"P3", a:0, b:5}]; q = 2; break;
-        case "E": 
+        case "E":
             // Scenario E Instruction: Guide user into the validation loop
             alert("SCENARIO E: Validation Case\n\nPlease enter a valid input.");
             startManualInput(); // Proceed to input process
@@ -131,18 +129,66 @@ function execute(data, quantum) {
 
     renderResult('rr', gRR, mRR, pRR);
     renderResult('srtf', gSRTF, mSRTF, pSRTF);
-    
-    // Academic Analysis Updates
-    const wBest = mSRTF.getAverageWaitingTime() < mRR.getAverageWaitingTime() ? "SRTF" : "Round Robin";
-    const rBest = mRR.getAverageResponseTime() < mSRTF.getAverageResponseTime() ? "Round Robin" : "SRTF";
-    
-    document.getElementById('ans-wt').innerText = `${wBest} yielded lower average waiting time.`;
-    document.getElementById('ans-rt').innerText = `${rBest} yielded lower average response time.`;
-    document.getElementById('ans-q').innerText = `Quantum of ${quantum} resulted in an average RR response time of ${mRR.getAverageResponseTime().toFixed(2)}ms.`;
-    document.getElementById('ans-rec').innerText = `Recommendation: Use ${wBest} for efficiency or RR for fairness.`;
-    
-    document.getElementById('concl-metrics').innerText = `Metric Comparison: SRTF (WT: ${mSRTF.getAverageWaitingTime().toFixed(2)}) vs RR (WT: ${mRR.getAverageWaitingTime().toFixed(2)}).`;
-    document.getElementById('concl-quantum').innerText = `Quantum Observation: The choice of ${quantum} dictates the balance between context switching and process progress.`;
+
+    // Academic Analysis Updates — fully dynamic, tie-aware
+    const rrWT    = mRR.getAverageWaitingTime();
+    const srtfWT  = mSRTF.getAverageWaitingTime();
+    const rrRT    = mRR.getAverageResponseTime();
+    const srtfRT  = mSRTF.getAverageResponseTime();
+    const rrTAT   = mRR.getAverageTurnaroundTime();
+    const srtfTAT = mSRTF.getAverageTurnaroundTime();
+
+    // Waiting time winner
+    let wBest;
+    if (srtfWT < rrWT)       wBest = `SRTF (${srtfWT.toFixed(2)}ms) yielded lower average waiting time than Round Robin (${rrWT.toFixed(2)}ms).`;
+    else if (rrWT < srtfWT)  wBest = `Round Robin (${rrWT.toFixed(2)}ms) yielded lower average waiting time than SRTF (${srtfWT.toFixed(2)}ms).`;
+    else                     wBest = `Both algorithms tied on average waiting time (${rrWT.toFixed(2)}ms).`;
+
+    // Response time winner
+    let rBest;
+    if (rrRT < srtfRT)       rBest = `Round Robin (${rrRT.toFixed(2)}ms) yielded lower average response time than SRTF (${srtfRT.toFixed(2)}ms).`;
+    else if (srtfRT < rrRT)  rBest = `SRTF (${srtfRT.toFixed(2)}ms) yielded lower average response time than Round Robin (${rrRT.toFixed(2)}ms).`;
+    else                     rBest = `Both algorithms tied on average response time (${rrRT.toFixed(2)}ms).`;
+
+    // Recommendation — based on actual results
+    let rec;
+    if (srtfWT < rrWT && rrRT < srtfRT)
+        rec = `Use SRTF for efficiency (lower WT: ${srtfWT.toFixed(2)}ms) or Round Robin for responsiveness (lower RT: ${rrRT.toFixed(2)}ms) — depends on workload priority.`;
+    else if (srtfWT < rrWT)
+        rec = `SRTF is recommended — it achieved lower waiting time (${srtfWT.toFixed(2)}ms vs ${rrWT.toFixed(2)}ms) and lower response time (${srtfRT.toFixed(2)}ms vs ${rrRT.toFixed(2)}ms) for this workload.`;
+    else if (rrRT < srtfRT)
+        rec = `Round Robin is recommended — it achieved better response time (${rrRT.toFixed(2)}ms vs ${srtfRT.toFixed(2)}ms), making it more suitable for interactive workloads.`;
+    else
+        rec = `Both algorithms performed equally on this workload (WT: ${rrWT.toFixed(2)}ms, RT: ${rrRT.toFixed(2)}ms). Either is suitable.`;
+
+    // Quantum observation — based on actual RR TAT vs SRTF TAT
+    let qObs;
+    if (quantum <= 2)
+        qObs = `Quantum of ${quantum} is very small — high context switching overhead, but RR response time was ${rrRT.toFixed(2)}ms. Smaller quanta improve fairness at the cost of efficiency.`;
+    else if (rrTAT <= srtfTAT + 1)
+        qObs = `Quantum of ${quantum} produced RR turnaround (${rrTAT.toFixed(2)}ms) close to SRTF (${srtfTAT.toFixed(2)}ms), suggesting the quantum was well-sized for this workload.`;
+    else
+        qObs = `Quantum of ${quantum} caused RR turnaround (${rrTAT.toFixed(2)}ms) to exceed SRTF (${srtfTAT.toFixed(2)}ms) by ${(rrTAT - srtfTAT).toFixed(2)}ms. A smaller quantum may improve responsiveness.`;
+
+    document.getElementById('ans-wt').innerText  = wBest;
+    document.getElementById('ans-rt').innerText  = rBest;
+    document.getElementById('ans-q').innerText   = qObs;
+    document.getElementById('ans-rec').innerText = rec;
+
+    // Conclusion — dynamic per run, mapped to 4 separate li elements
+    const tatWinner = srtfTAT < rrTAT ? `SRTF (${srtfTAT.toFixed(2)}ms)` : rrTAT < srtfTAT ? `Round Robin (${rrTAT.toFixed(2)}ms)` : `Both tied (${rrTAT.toFixed(2)}ms)`;
+
+    document.getElementById('concl-metrics').innerText = `Metric Comparison — WT: SRTF ${srtfWT.toFixed(2)}ms vs RR ${rrWT.toFixed(2)}ms | TAT: SRTF ${srtfTAT.toFixed(2)}ms vs RR ${rrTAT.toFixed(2)}ms | RT: SRTF ${srtfRT.toFixed(2)}ms vs RR ${rrRT.toFixed(2)}ms. Best overall TAT: ${tatWinner}.`;
+
+    document.getElementById('concl-fair').innerText = rrRT < srtfRT
+        ? `Fairness: Round Robin appeared fairer — it gave all processes CPU access sooner, achieving an average response time of ${rrRT.toFixed(2)}ms vs SRTF's ${srtfRT.toFixed(2)}ms. Time-slicing prevented any single process from blocking others.`
+        : `Fairness: Round Robin provided equal time slices to all processes. However, on this workload SRTF matched or outperformed it on response time (${srtfRT.toFixed(2)}ms vs ${rrRT.toFixed(2)}ms), suggesting the jobs were short enough that SRTF's preemption acted fairly as well.`;
+
+    document.getElementById('concl-eff').innerText = srtfWT < rrWT
+        ? `Efficiency: SRTF appeared more efficient — it minimised average waiting time (${srtfWT.toFixed(2)}ms vs RR's ${rrWT.toFixed(2)}ms) by always running the shortest remaining job, reducing total time processes spent idle in the queue.`
+        : `Efficiency: On this workload both algorithms achieved similar waiting times (SRTF: ${srtfWT.toFixed(2)}ms, RR: ${rrWT.toFixed(2)}ms). This typically occurs when burst times are equal or processes arrive sequentially with no overlap.`;
+
+    document.getElementById('concl-q-effect').innerText = `Quantum Effect: A quantum of ${quantum} gave RR an average response time of ${rrRT.toFixed(2)}ms and turnaround of ${rrTAT.toFixed(2)}ms. ${quantum <= 2 ? "Small quanta maximise fairness but increase context switching overhead." : quantum >= 10 ? "Large quanta reduce switching overhead but hurt fairness — RR approaches FCFS behaviour." : "This quantum balanced fairness and overhead reasonably for this workload."}`;
 }
 
 /**

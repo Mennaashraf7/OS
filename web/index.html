@@ -2,148 +2,149 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Academic Scheduler Analysis | RR vs SRTF</title>
+    <title>CPU Scheduler Analysis | RR vs SRTF</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@500;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="bg-gradient"></div>
+<div class="bg-gradient"></div>
 
-    <header class="container main-header">
-        <div class="header-content">
-            <h1>Algorithms <span class="text-indigo">Comparison</span></h1>
-            <p class="subtitle">An evaluation of Round Robin (Fairness) vs SRTF (Efficiency)</p>
+<header class="container main-header">
+    <div class="header-content">
+        <h1>Algorithms <span class="text-indigo">Comparison</span></h1>
+        <p class="subtitle">An evaluation of Round Robin (Fairness) vs SRTF (Efficiency)</p>
+    </div>
+    <div class="header-actions">
+        <button id="run-btn" class="btn btn-primary">Manual Simulation</button>
+        <button id="reset-btn" class="btn btn-outline">Reset Dashboard</button>
+    </div>
+</header>
+
+<main class="container">
+    <!-- Scenario Buttons -->
+    <section class="card info-card">
+        <h3 class="section-label">Required Test Scenarios</h3>
+        <div class="scenario-buttons">
+            <button class="scen-btn" data-scen="A">Scenario A<br><span>Mixed Workload</span></button>
+            <button class="scen-btn" data-scen="B">Scenario B<br><span>Quantum Sensitivity</span></button>
+            <button class="scen-btn" data-scen="C">Scenario C<br><span>Short-Job Heavy</span></button>
+            <button class="scen-btn" data-scen="D">Scenario D<br><span>Interactive Fairness</span></button>
+            <button class="scen-btn" data-scen="E">Scenario E<br><span>Validation Case</span></button>
         </div>
-        <div class="header-actions">
-            <button id="run-btn" class="btn btn-primary">Manual Simulation</button>
-            <button id="reset-btn" class="btn btn-outline">Reset Dashboard</button>
+    </section>
+
+    <!-- Round Robin Section -->
+    <section class="algo-section rr-theme">
+        <div class="algo-title">
+            <div class="indicator"></div>
+            <h2>Round Robin (RR)</h2>
+            <span class="tag">Fairness focused</span>
         </div>
-    </header>
 
-    <main class="container">
-        <!-- Scenario Buttons -->
-        <section class="card info-card">
-            <h3 class="section-label">Required Test Scenarios</h3>
-            <div class="scenario-buttons">
-                <button class="scen-btn" data-scen="A">Scenario A<br><span>Mixed Workload</span></button>
-                <button class="scen-btn" data-scen="B">Scenario B<br><span>Quantum Sensitivity</span></button>
-                <button class="scen-btn" data-scen="C">Scenario C<br><span>Short-Job Heavy</span></button>
-                <button class="scen-btn" data-scen="D">Scenario D<br><span>Interactive Fairness</span></button>
-                <button class="scen-btn danger" data-scen="E">Scenario E<br><span>Validation Case</span></button>
-            </div>
-        </section>
+        <div class="results-grid">
+            <div class="metrics-panel" id="rr-metrics"></div>
 
-        <!-- Round Robin Section -->
-        <section class="algo-section rr-theme">
-            <div class="algo-title">
-                <div class="indicator"></div>
-                <h2>Round Robin (RR)</h2>
-                <span class="tag">Fairness focused</span>
-            </div>
+            <div class="viz-panel">
+                <div class="ready-queue-box">
+                    <label class="viz-label">Ready Queue Order</label>
+                    <div id="rr-queue" class="queue-list"></div>
+                </div>
 
-            <div class="results-grid">
-                <div class="metrics-panel" id="rr-metrics"></div>
-
-                <div class="viz-panel">
-                    <div class="ready-queue-box">
-                        <label class="viz-label">Ready Queue Order</label>
-                        <div id="rr-queue" class="queue-list"></div>
-                    </div>
-                    
-                    <div class="gantt-wrapper">
-                        <label class="viz-label">Gantt Chart Timeline</label>
-                        <div id="rr-gantt" class="gantt-track"></div>
-                        <div id="rr-ticks" class="gantt-ticks"></div>
-                    </div>
+                <div class="gantt-wrapper">
+                    <br>
+                    <label class="viz-label">Gantt Chart Timeline</label>
+                    <div id="rr-gantt" class="gantt-track"></div>
+                    <div id="rr-ticks" class="gantt-ticks"></div>
                 </div>
             </div>
+        </div>
 
-            <div class="table-container">
-                <table id="rr-table">
-                    <thead><tr><th>PID</th><th>Arrival</th><th>Burst</th><th>WT</th><th>TAT</th><th>RT</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </section>
+        <div class="table-container">
+            <table id="rr-table">
+                <thead><tr><th>PID</th><th>Arrival</th><th>Burst</th><th>WT</th><th>TAT</th><th>RT</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
 
-        <!-- SRTF Section -->
-        <section class="algo-section srtf-theme">
-            <div class="algo-title">
-                <div class="indicator"></div>
-                <h2>Shortest Remaining Time First (SRTF)</h2>
-                <span class="tag">Efficiency focused</span>
-            </div>
+    <!-- SRTF Section -->
+    <section class="algo-section srtf-theme">
+        <div class="algo-title">
+            <div class="indicator"></div>
+            <h2>Shortest Remaining Time First (SRTF)</h2>
+            <span class="tag">Efficiency focused</span>
+        </div>
 
-            <div class="results-grid">
-                <div class="metrics-panel" id="srtf-metrics"></div>
+        <div class="results-grid">
+            <div class="metrics-panel" id="srtf-metrics"></div>
 
-                <div class="viz-panel">
-                    <div class="gantt-wrapper">
-                        <label class="viz-label">Gantt Chart Timeline</label>
-                        <div id="srtf-gantt" class="gantt-track"></div>
-                        <div id="srtf-ticks" class="gantt-ticks"></div>
-                    </div>
+            <div class="viz-panel">
+                <div class="gantt-wrapper">
+                    <label class="viz-label">Gantt Chart Timeline</label>
+                    <div id="srtf-gantt" class="gantt-track"></div>
+                    <div id="srtf-ticks" class="gantt-ticks"></div>
                 </div>
             </div>
+        </div>
 
-            <div class="table-container">
-                <table id="srtf-table">
-                    <thead><tr><th>PID</th><th>Arrival</th><th>Burst</th><th>WT</th><th>TAT</th><th>RT</th></tr></thead>
-                    <tbody></tbody>
-                </table>
+        <div class="table-container">
+            <table id="srtf-table">
+                <thead><tr><th>PID</th><th>Arrival</th><th>Burst</th><th>WT</th><th>TAT</th><th>RT</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Required Analysis Questions -->
+    <section class="card analysis-section">
+        <h2 class="section-label">Required Analysis Questions</h2>
+        <div class="analysis-grid">
+            <div class="qa-item">
+                <h4>Which algorithm gave better average waiting time?</h4>
+                <p id="ans-wt">Pending simulation...</p>
             </div>
-        </section>
-
-        <!-- Required Analysis Questions -->
-        <section class="card analysis-section">
-            <h2 class="section-label">Required Analysis Questions</h2>
-            <div class="analysis-grid">
-                <div class="qa-item">
-                    <h4>Which algorithm gave better average waiting time?</h4>
-                    <p id="ans-wt">Pending simulation...</p>
-                </div>
-                <div class="qa-item">
-                    <h4>Which algorithm gave better response time?</h4>
-                    <p id="ans-rt">Pending simulation...</p>
-                </div>
-                <div class="qa-item">
-                    <h4>Did Round Robin appear fairer?</h4>
-                    <p>Yes. By using time-slicing (Quantum), it prevents long processes from blocking others indefinitely.</p>
-                </div>
-                <div class="qa-item">
-                    <h4>Did SRTF complete short jobs faster?</h4>
-                    <p>Yes. Its preemptive nature ensures the process with the least remaining time is always prioritized.</p>
-                </div>
-                <div class="qa-item">
-                    <h4>How did the selected quantum affect RR?</h4>
-                    <p id="ans-q">The quantum size balances the tradeoff between responsiveness and overhead.</p>
-                </div>
-                <div class="qa-item">
-                    <h4>Algorithm Recommendation:</h4>
-                    <p id="ans-rec">Analysis will be provided after execution.</p>
-                </div>
+            <div class="qa-item">
+                <h4>Which algorithm gave better response time?</h4>
+                <p id="ans-rt">Pending simulation...</p>
             </div>
-        </section>
+            <div class="qa-item">
+                <h4>Did Round Robin appear fairer?</h4>
+                <p>Yes. By using time-slicing (Quantum), it prevents long processes from blocking others indefinitely.</p>
+            </div>
+            <div class="qa-item">
+                <h4>Did SRTF complete short jobs faster?</h4>
+                <p>Yes. Its preemptive nature ensures the process with the least remaining time is always prioritized.</p>
+            </div>
+            <div class="qa-item">
+                <h4>How did the selected quantum affect RR?</h4>
+                <p id="ans-q">The quantum size balances the tradeoff between responsiveness and overhead.</p>
+            </div>
+            <div class="qa-item">
+                <h4>Algorithm Recommendation:</h4>
+                <p id="ans-rec">Analysis will be provided after execution.</p>
+            </div>
+        </div>
+    </section>
 
-        <!-- Required Conclusion -->
-        <section class="card conclusion-area">
-            <h2 class="section-label">Required Conclusion</h2>
-            <ul class="conclusion-list">
-                <li id="concl-metrics">Comparison metrics pending...</li>
-                <li><strong>Fairness:</strong> Round Robin appeared fairer across processes due to preemption.</li>
-                <li><strong>Efficiency:</strong> SRTF appeared more efficient by minimizing average stay in the system.</li>
-                <li id="concl-quantum"><strong>Quantum Observation:</strong> The quantum choice determines the context switching frequency.</li>
-            </ul>
-        </section>
-    </main>
+    <!-- Required Conclusion -->
+    <section class="card conclusion-area">
+        <h2 class="section-label">Required Conclusion</h2>
+        <ul class="conclusion-list">
+            <li id="concl-metrics">Performance metric comparison pending...</li>
+            <li id="concl-fair">Round Robin's fairness assessment pending...</li>
+            <li id="concl-eff">SRTF efficiency assessment pending...</li>
+            <li id="concl-q-effect">Quantum effect observation pending...</li>
+        </ul>
+    </section>
+</main>
 
-    <!-- Load Logic -->
-    <script src="Process.js"></script>
-    <script src="GanttEntry.js"></script>
-    <script src="ValidateInput.js"></script>
-    <script src="SchedulerMetrics.js"></script>
-    <script src="RoundRobin.js"></script>
-    <script src="SRTF.js"></script>
-    <script src="ui.js"></script>
+<!-- Load Logic -->
+<script src="Process.js"></script>
+<script src="GanttEntry.js"></script>
+<script src="ValidateInput.js"></script>
+<script src="SchedulerMetrics.js"></script>
+<script src="RoundRobin.js"></script>
+<script src="SRTF.js"></script>
+<script src="ui.js"></script>
 </body>
 </html>
