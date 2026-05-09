@@ -127,7 +127,7 @@ function execute(data, quantum) {
     const mRR = new SchedulerMetrics(pRR);
     const mSRTF = new SchedulerMetrics(pSRTF);
 
-    renderResult('rr', gRR, mRR, pRR);
+    renderResult('rr', gRR, mRR, pRR,quantum);
     renderResult('srtf', gSRTF, mSRTF, pSRTF);
 
     // Academic Analysis Updates — fully dynamic, tie-aware
@@ -194,7 +194,7 @@ function execute(data, quantum) {
 /**
  * Renders the results to the dashboard
  */
-function renderResult(id, gantt, metrics, procs) {
+function renderResult(id, gantt, metrics, procs, quantum = null) {
     const buildF = (arr, getter) => `(${arr.map(p => p[getter]()).join('+')}) / ${arr.length}`;
     
     document.getElementById(`${id}-metrics`).innerHTML = `
@@ -240,6 +240,22 @@ function renderResult(id, gantt, metrics, procs) {
         tick.style.flex = dur;
         tick.innerHTML = `<span>${entry.getStartTime()}</span>`;
         ticks.appendChild(tick);
+
+
+        if (id === 'rr' && quantum !== null) {
+             const label = document.getElementById('rr-gantt-label');
+             if (label) label.innerHTML = `GANTT CHART TIMELINE <span style="
+                 background: var(--slate-dim);
+                 color: white;
+                 font-size: 0.65rem;
+                 font-weight: 700;
+                 padding: 2px 8px;
+                 border-radius: 999px;
+                 margin-left: 8px;
+                 letter-spacing: 0.05em;
+             ">q = ${quantum}</span>`;
+         }
+
 
         if (idx === gantt.length - 1) {
             const end = document.createElement('span');
