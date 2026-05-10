@@ -48,13 +48,10 @@ public class SRTF {
             }
 
             // blockStartTime is saved BEFORE currentTime increments
-            // flush previous block BEFORE starting new one
             if (previousProcess == null || previousProcess.getPID() != currentProcess.getPID()) {
                 if (previousProcess != null) {
-                    //flush previous block using currentTime BEFORE it increments
                     gantt.add(new GanttEntry(previousProcess.getPID(), blockStartTime, currentTime));
                 }
-                //save new block start BEFORE currentTime increments
                 blockStartTime = currentTime;
             }
 

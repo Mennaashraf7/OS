@@ -12,7 +12,7 @@ public class Process {
 
     public Process(int PID, int arrivalTime, int burstTime) {
         this.PID = PID;
-        this.arrivalTime = arrivalTime;
+        this.arrivalTime = arrivalTime; 
         this.burstTime = burstTime;
         this.remainingTime = burstTime;
         this.responseTime = -1;

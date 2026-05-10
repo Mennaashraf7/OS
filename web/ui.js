@@ -1,8 +1,4 @@
-/**
- * UI BRIDGE & ACADEMIC ANALYSIS
- */
 
-// 1. MONKEY PATCH: Fix 'isStarted' naming collision in Process.js
 const originalProcess = Process;
 Process = function(PID, arrivalTime, burstTime) {
     const instance = new originalProcess(PID, arrivalTime, burstTime);
@@ -14,7 +10,7 @@ Process.prototype = originalProcess.prototype;
 Process.prototype.setStarted = function(val) { this._realStartedFlag = val; };
 Process.prototype.isStarted = function() { return this._realStartedFlag; };
 
-// 2. MONKEY PATCH: Fix "Cancel" Loop and Validate Input
+
 ValidateInput.getInt = function(q, min, max) {
     while (true) {
         let s = prompt(q);
@@ -47,7 +43,6 @@ ValidateInput.setUniquePID = function(existingData) {
         alert(`Error: The PID "${pid}" is already taken. Please enter a unique ID.`);
     }
 };
-// =========================================================
 
 // 3. Helper: PriorityQueue for SRTF logic
 class PriorityQueue {
@@ -75,9 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('reset-btn').onclick = () => location.reload();
 });
 
-/**
- * Handles the manual entry flow
- */
+ 
 function startManualInput() {
     try {
         const n = ValidateInput.setValidNumberOfProcesses();
@@ -95,18 +88,55 @@ function startManualInput() {
     }
 }
 
-/**
- * Handles predefined scenarios
- */
+
 function runScenario(type) {
     let d = [], q = 2;
     switch (type) {
-        case "A": d = [{id:"P1", a:0, b:6}, {id:"P2", a:1, b:4}, {id:"P3", a:2, b:2}]; q = 3; break;
-        case "B": d = [{id:"P1", a:0, b:10}, {id:"P2", a:1, b:2}]; q = 1; break;
-        case "C": d = [{id:"P1", a:0, b:10}, {id:"P2", a:1, b:1}, {id:"P3", a:2, b:1}]; q = 4; break;
-        case "D": d = [{id:"P1", a:0, b:5}, {id:"P2", a:0, b:5}, {id:"P3", a:0, b:5}]; q = 2; break;
-        case "E":
-            // Scenario E Instruction: Guide user into the validation loop
+      case "A":
+  d = [
+    {id:"P1", a:0, b:8},
+    {id:"P2", a:1, b:4},
+    {id:"P3", a:2, b:9},
+    {id:"P4", a:3, b:5}
+  ];
+  q = 3;
+  break;
+
+case "B":
+  d = [
+    {id:"P1", a:0, b:10},
+    {id:"P2", a:0, b:6},
+    {id:"P3", a:0, b:2},
+    {id:"P4", a:0, b:4}
+  ];
+  q = 2;
+  break;
+
+case "C":
+  d = [
+    {id:"P1", a:0, b:2},
+    {id:"P2", a:1, b:1},
+    {id:"P3", a:2, b:3},
+    {id:"P4", a:3, b:1},
+    {id:"P5", a:4, b:2}
+  ];
+  q = 2;
+  break;
+
+case "D":
+  d = [
+    {id:"P1", a:0, b:6},
+    {id:"P2", a:0, b:6},
+    {id:"P3", a:0, b:6},
+    {id:"P4", a:0, b:6}
+  ];
+  q = 2;
+  break;
+
+case "E":
+  alert("SCENARIO E: Validation Case\n\nPlease enter a valid input.");
+  startManualInput();
+  return;
             alert("SCENARIO E: Validation Case\n\nPlease enter a valid input.");
             startManualInput(); // Proceed to input process
             return;
@@ -114,9 +144,7 @@ function runScenario(type) {
     execute(d, q);
 }
 
-/**
- * Core Execution and Logic Integration
- */
+
 function execute(data, quantum) {
     const pRR = data.map(d => new Process(d.id, d.a, d.b));
     const pSRTF = data.map(d => new Process(d.id, d.a, d.b));
@@ -130,7 +158,6 @@ function execute(data, quantum) {
     renderResult('rr', gRR, mRR, pRR,quantum);
     renderResult('srtf', gSRTF, mSRTF, pSRTF);
 
-    // Academic Analysis Updates — fully dynamic, tie-aware
     const rrWT    = mRR.getAverageWaitingTime();
     const srtfWT  = mSRTF.getAverageWaitingTime();
     const rrRT    = mRR.getAverageResponseTime();
@@ -138,19 +165,19 @@ function execute(data, quantum) {
     const rrTAT   = mRR.getAverageTurnaroundTime();
     const srtfTAT = mSRTF.getAverageTurnaroundTime();
 
-    // Waiting time winner
+
     let wBest;
     if (srtfWT < rrWT)       wBest = `SRTF (${srtfWT.toFixed(2)}ms) yielded lower average waiting time than Round Robin (${rrWT.toFixed(2)}ms).`;
     else if (rrWT < srtfWT)  wBest = `Round Robin (${rrWT.toFixed(2)}ms) yielded lower average waiting time than SRTF (${srtfWT.toFixed(2)}ms).`;
     else                     wBest = `Both algorithms tied on average waiting time (${rrWT.toFixed(2)}ms).`;
 
-    // Response time winner
+   
     let rBest;
     if (rrRT < srtfRT)       rBest = `Round Robin (${rrRT.toFixed(2)}ms) yielded lower average response time than SRTF (${srtfRT.toFixed(2)}ms).`;
     else if (srtfRT < rrRT)  rBest = `SRTF (${srtfRT.toFixed(2)}ms) yielded lower average response time than Round Robin (${rrRT.toFixed(2)}ms).`;
     else                     rBest = `Both algorithms tied on average response time (${rrRT.toFixed(2)}ms).`;
 
-    // Recommendation — based on actual results
+  
     let rec;
     if (srtfWT < rrWT && rrRT < srtfRT)
         rec = `Use SRTF for efficiency (lower WT: ${srtfWT.toFixed(2)}ms) or Round Robin for responsiveness (lower RT: ${rrRT.toFixed(2)}ms) — depends on workload priority.`;
@@ -175,7 +202,6 @@ function execute(data, quantum) {
     document.getElementById('ans-q').innerText   = qObs;
     document.getElementById('ans-rec').innerText = rec;
 
-    // Conclusion — dynamic per run, mapped to 4 separate li elements
     const tatWinner = srtfTAT < rrTAT ? `SRTF (${srtfTAT.toFixed(2)}ms)` : rrTAT < srtfTAT ? `Round Robin (${rrTAT.toFixed(2)}ms)` : `Both tied (${rrTAT.toFixed(2)}ms)`;
 
     document.getElementById('concl-metrics').innerText = `Metric Comparison — WT: SRTF ${srtfWT.toFixed(2)}ms vs RR ${rrWT.toFixed(2)}ms | TAT: SRTF ${srtfTAT.toFixed(2)}ms vs RR ${rrTAT.toFixed(2)}ms | RT: SRTF ${srtfRT.toFixed(2)}ms vs RR ${rrRT.toFixed(2)}ms. Best overall TAT: ${tatWinner}.`;
@@ -191,9 +217,7 @@ function execute(data, quantum) {
     document.getElementById('concl-q-effect').innerText = `Quantum Effect: A quantum of ${quantum} gave RR an average response time of ${rrRT.toFixed(2)}ms and turnaround of ${rrTAT.toFixed(2)}ms. ${quantum <= 2 ? "Small quanta maximise fairness but increase context switching overhead." : quantum >= 10 ? "Large quanta reduce switching overhead but hurt fairness — RR approaches FCFS behaviour." : "This quantum balanced fairness and overhead reasonably for this workload."}`;
 }
 
-/**
- * Renders the results to the dashboard
- */
+
 function renderResult(id, gantt, metrics, procs, quantum = null) {
     const buildF = (arr, getter) => `(${arr.map(p => p[getter]()).join('+')}) / ${arr.length}`;
     
@@ -273,9 +297,7 @@ function renderResult(id, gantt, metrics, procs, quantum = null) {
     }
 }
 
-/**
- * Utility: Generates a consistent dark color for PIDs
- */
+
 function getDarkColor(pid) {
     const palette = ['#1e293b', '#334155', '#475569', '#0f172a', '#1e1b4b', '#312e81'];
     const n = parseInt(pid.toString().replace(/\D/g, '')) || 0;

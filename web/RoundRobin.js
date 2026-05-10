@@ -61,7 +61,6 @@ class RoundRobin {
                     endTime
             ));
 
-            // Update time and remaining burst
             currentTime = endTime;
             currentProcess.setRemainingTime(currentProcess.getRemainingTime() - runTime);
 
@@ -75,11 +74,11 @@ class RoundRobin {
                 }
             }
 
-            // If process still has remaining time → goes back to end of queue
+            // If process still has remaining time goes back to end of queue
             if (currentProcess.getRemainingTime() > 0) {
                 readyQueue.push(frontIndex);
             } else {
-                // Process is done!
+            
                 currentProcess.setCompletionTime(currentTime);
                 currentProcess.setTurnaroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
                 currentProcess.setWaitingTime(currentProcess.getTurnaroundTime() - currentProcess.getBurstTime());

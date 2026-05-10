@@ -3,7 +3,6 @@ class ValidateInput {
         let value = 0;
         let flag = true;
         while (flag) {
-            // prompt() displays the question and blocks for input (matches Scanner behavior in browsers)
             let inputStr = prompt(question);
             // Handle user closing/canceling the prompt dialog
             if (inputStr === null) {
@@ -11,7 +10,7 @@ class ValidateInput {
                 continue;
             }
             try {
-                // Simulate Java's nextInt() parsing & InputMismatchException
+            
                 let parsed = parseInt(inputStr, 10);
                 if (isNaN(parsed) || inputStr.trim() === "") {
                     throw new Error("InputMismatchException");
@@ -28,7 +27,6 @@ class ValidateInput {
         }
         return value;
     }
-// أضف هذه الدالة داخل كلاس ValidateInput
     static setUniquePID(existingData) {
         while (true) {
             let pid = prompt("Please enter a unique PID (e.g., P1, 101):");
